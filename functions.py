@@ -6,6 +6,10 @@ import seaborn as sns
 
 from sklearn.metrics import roc_curve, auc
 
+################################################################################
+################## Custom Functions for CKD_UAE Project ########################
+################################################################################
+
 
 # Function to move a column to be immediately to the left of another column
 def move_column_before(df, target_column, before_column):
@@ -16,26 +20,27 @@ def move_column_before(df, target_column, before_column):
     Parameters:
     - df (pd.DataFrame): The DataFrame containing the columns to be rearranged.
     - target_column (str): The name of the column to move. This column will be
-      repositioned in the DataFrame.
+                           repositioned in the DataFrame.
     - before_column (str): The name of the column before which the target
-      column will be placed. The target column will be moved to the immediate
-      left of this column.
+                           column will be placed. The target column will be 
+                           moved to the immediate left of this column.
 
     Returns:
     - pd.DataFrame: A DataFrame with the columns rearranged according to the
-      specified order. If either the target_column or before_column does not
-      exist in the DataFrame, the function will print an error message and
-      return the original DataFrame unchanged.
+                    specified order. If either the target_column or before_column 
+                    does not exist in the DataFrame, the function will print an 
+                    error message and return the original DataFrame unchanged.
 
     Raises:
     - ValueError: If `target_column` or `before_column` are not found in the
-      DataFrame's columns.
+                  DataFrame's columns.
     """
 
     # Ensure both columns exist in the DataFrame
     if target_column not in df.columns or before_column not in df.columns:
         print(
-            f"One or both specified columns ('{target_column}', '{before_column}') are not in the DataFrame.",
+            f"One or both specified columns ('{target_column}', "
+            f"'{before_column}') are not in the DataFrame."
         )
         return df
 
@@ -53,6 +58,8 @@ def move_column_before(df, target_column, before_column):
     return df[cols]
 
 
+################################################################################
+################################ Cross-Tab Plot ################################
 ################################################################################
 
 
@@ -75,34 +82,40 @@ def crosstab_plot(
 ):
     """
     Generates a series of crosstab plots to visualize the relationship between
-    an outcome variable and several categorical variables within a dataset. Each subplot
-    represents the distribution of outcomes for a specific categorical variable, allowing
-    for comparisons across categories.
+    an outcome variable and several categorical variables within a dataset. Each
+    subplot represents the distribution of outcomes for a specific categorical
+    variable, allowing for comparisons across categories.
 
-    The subplot grid, plot size, legend placement, and subplot padding are customizable.
-    The function can create standard or normalized crosstab plots based on the
-    'crosstab_option' flag.
+    The subplot grid, plot size, legend placement, and subplot padding are
+    customizable. The function can create standard or normalized crosstab plots
+    based on the 'crosstab_option' flag.
 
     Parameters:
     - df: The DataFrame to pass in.
-    - sub1, sub2 (int): The number of rows and columns in the subplot grid, respectively.
-    - x, y (int): Width and height of each subplot, affecting the overall figure size.
-    - list_name (list[str]): A list of strings representing the column names to be plotted.
-    - label1, label2 (str): Labels for the x-axis categories, corresponding to the unique
-      values in the 'outcome' variable of the dataframe.
-    - col1 (str): The column name in the dataframe for which custom legend labels are desired.
+    - sub1, sub2 (int): The number of rows and columns in the subplot grid.
+    - x, y (int): Width & height of ea. subplot, affecting the overall fig. size.
+    - list_name (list[str]): A list of strings rep. the column names to be plotted.
+    - label1, label2 (str): Labels for the x-axis categories, corresponding to
+                            the unique values in the 'outcome' variable of the
+                            dataframe.
+    - col1 (str): The column name in the dataframe for which custom legend
+                  labels are desired.
     - item1, item2 (str): Custom legend labels for the plot corresponding to 'col1'.
     - bbox_to_anchor (tuple): A tuple of (x, y) coordinates to anchor the legend to a
-      specific point within the axes.
-    - w_pad, h_pad (float): The amount of width and height padding (space) between subplots.
-    - crosstab_option (bool, optional): If True, generates standard crosstab plots. If False,
-      generates normalized crosstab plots, which are useful for comparing distributions
-      across groups with different sizes.
+                              specific point within the axes.
+    - w_pad, h_pad (float): The amount of width and height padding (space)
+                            between subplots.
+    - crosstab_option (bool, optional): If True, generates standard crosstab
+                                        plots. If False, generates normalized
+                                        crosstab plots, which are useful for
+                                        comparing distributions across groups
+                                        with different sizes.
 
-    The function creates a figure with the specified number of subplots laid out in a grid,
-    plots the crosstabulation data as bar plots within each subplot, and then adjusts the
-    legend and labels accordingly. It uses a tight layout with specified padding to ensure
-    that subplots are neatly arranged without overlapping elements.
+    The function creates a figure with the specified number of subplots laid out
+    in a grid, plots the crosstabulation data as bar plots within each subplot,
+    and then adjusts the legend and labels accordingly. It uses a tight layout
+    with specified padding to ensure that subplots are neatly arranged without
+    overlapping elements.
     """
 
     fig, axes = plt.subplots(sub1, sub2, figsize=(x, y))
@@ -157,6 +170,8 @@ def crosstab_plot(
 
 
 ################################################################################
+############################## Stacked Bar Graph ###############################
+################################################################################
 
 
 def stacked_plot(
@@ -168,87 +183,117 @@ def stacked_plot(
     truth,
     condition,
     kind,
-    title1,
-    xlabel1,
-    ylabel1,
     width,
     rot,
-    title2,
-    xlabel2,
-    ylabel2,
+    ascending=True,
+    string=None,
+    custom_order=None,
+    legend_labels=False,
 ):
     """
-    This function provides a stacked and normalized bar graph of any column of
-    interest, colored by ground truth column
-    Inputs:
-        x: x-axis figure size
-        y: y-axis figure size
-        df: dataframe to ingest for the stacked plot
-        col: column of interest
-        truth: ground truth column
-        condition: value from ground truth column
-        kind: type of graph
-        title1: title of first graph
-        xlabel1: x-axis label of first graph
-        ylabel1: y-axis label of first graph
-        width: width of first graph
-        rot: rotation of graph
-        title2: title of second graph
-        ylabel2: x-axis label of second graph
-        ylabel2: y-axis label of second graph
+    Generates a pair of stacked bar plots for a specified column against a ground
+    truth column, with the first plot showing absolute distributions and the
+    second plot showing normalized distributions.
+
+    Parameters:
+    - x (int): The width of the figure.
+    - y (int): The height of the figure.
+    - p (int): The padding between the subplots.
+    - df (DataFrame): The pandas DataFrame containing the data.
+    - col (str): The name of the column in the DataFrame to be analyzed.
+    - truth (str): The name of the ground truth column in the DataFrame.
+    - condition: Unused parameter, included for future use.
+    - kind (str): The kind of plot to generate (e.g., 'bar', 'barh').
+    - width (float): The width of the bars in the bar plot.
+    - rot (int): The rotation angle of the x-axis labels.
+    - ascending (bool, optional): Determines the sorting order of the DataFrame
+                                  based on the 'col'. Defaults to True.
+    - string (str, optional): Descriptive string to inc. in title of the plots.
+    - custom_order (list, optional): A list specifying a custom order for the
+                                     categories in the 'col'. If provided, the
+                                     DataFrame is sorted according to this order.
+    - legend_labels (bool or list, optional): Specifies whether to display
+                                              legend labels and what those
+                                              labels should be. If False, no
+                                              legend is displayed. If a list,
+                                              the list values are used as legend
+                                              labels.
+
+    Returns:
+    - None: The function creates & displays the plots but doesn't return value.
+
+    Note:
+    - The function assumes the matplotlib and pandas libraries have been
+      imported as plt and pd respectively.
+    - The function automatically handles the layout and spacing of the subplots
+      to prevent overlap.
     """
+    # Setting custom order if provided
+    if custom_order:
+        df[col] = pd.Categorical(df[col], categories=custom_order, ordered=True)
+        df.sort_values(
+            by=col, inplace=True
+        )  # Ensure the DataFrame respects the custom ordering
 
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(x, y))
-    flat = axes.flatten()
     fig.tight_layout(w_pad=5, pad=p, h_pad=5)
-    flat = axes.flatten()
-    # main title for both plots
-    fig.suptitle("Absolute Distributions vs. Normalized Distributions", fontsize=12)
-
-    # crosstabulation of column of interest and ground truth
-    crosstabdest = pd.crosstab(df[col], df[truth]).sort_values(
-        by=[condition], ascending=False
+    fig.suptitle(
+        "Absolute Distributions vs. Normalized Distributions",
+        fontsize=12,
     )
 
-    # normalized crosstabulation
+    # Crosstabulation of column of interest and ground truth
+    crosstabdest = pd.crosstab(df[col], df[truth])
+
+    # Normalized crosstabulation
     crosstabdestnorm = crosstabdest.div(crosstabdest.sum(1), axis=0)
 
-    # plotting the first stacked bar graph
-    plotdest = crosstabdest.plot(
+    title1 = f"{string} by {truth.capitalize()}"
+    title2 = f"{string} by {truth.capitalize()} (Normalized)"
+    xlabel1 = xlabel2 = f"{col}"
+    ylabel1 = "Count"
+    ylabel2 = "Frequency"
+
+    # Plotting the first stacked bar graph
+    crosstabdest.plot(
         kind=kind,
         stacked=True,
         title=title1,
-        ax=flat[0],
+        ax=axes[0],
         color=["#00BFC4", "#F8766D"],
         width=width,
         rot=rot,
         fontsize=12,
     )
-    flat[0].set_title(label=title1, fontsize=12)
-    flat[0].set_xlabel(xlabel1, fontsize=12)
-    flat[0].set_ylabel(ylabel1, fontsize=12)
-    flat[0].legend(fontsize=12)
-    # plotting the second, normalized stacked bar graph
-    plotdestnorm = crosstabdestnorm.plot(
+    axes[0].set_title(title1, fontsize=12)
+    axes[0].set_xlabel(xlabel1, fontsize=12)
+    axes[0].set_ylabel(ylabel1, fontsize=12)
+    axes[0].legend(legend_labels, fontsize=12)
+
+    # Plotting the second, normalized stacked bar graph
+    crosstabdestnorm.plot(
         kind=kind,
         stacked=True,
         title=title2,
         ylabel="Frequency",
-        ax=flat[1],
+        ax=axes[1],
         color=["#00BFC4", "#F8766D"],
         width=width,
         rot=rot,
         fontsize=12,
     )
-    flat[1].set_title(label=title2, fontsize=12)
-    flat[1].set_xlabel(xlabel2, fontsize=12)
-    flat[1].set_ylabel(ylabel2, fontsize=12)
-    flat[1].legend(fontsize=12)
+    axes[1].set_title(label=title2, fontsize=12)
+    axes[1].set_xlabel(xlabel2, fontsize=12)
+    axes[1].set_ylabel(ylabel2, fontsize=12)
+    axes[1].legend(legend_labels, fontsize=12)
+
     fig.align_ylabels()
+    plt.show()
 
 
 ################################################################################
-
+############################# ROC Curves by Category ###########################
+################################################################################
 
 def plot_roc_curves_by_category(
     X_test,
