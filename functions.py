@@ -4,12 +4,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import (
+    roc_curve,
+    auc,
+    brier_score_loss,
+    roc_curve,
+    auc,
+    precision_recall_curve,
+    precision_score,
+    recall_score,
+    confusion_matrix,
+    average_precision_score,
+)
+
+from sklearn.calibration import calibration_curve
 
 ################################################################################
 ################## Custom Functions for CKD_UAE Project ########################
 ################################################################################
-
 
 # Function to move a column to be immediately to the left of another column
 def move_column_before(df, target_column, before_column):
@@ -22,13 +34,13 @@ def move_column_before(df, target_column, before_column):
     - target_column (str): The name of the column to move. This column will be
                            repositioned in the DataFrame.
     - before_column (str): The name of the column before which the target
-                           column will be placed. The target column will be 
+                           column will be placed. The target column will be
                            moved to the immediate left of this column.
 
     Returns:
     - pd.DataFrame: A DataFrame with the columns rearranged according to the
-                    specified order. If either the target_column or before_column 
-                    does not exist in the DataFrame, the function will print an 
+                    specified order. If either the target_column or before_column
+                    does not exist in the DataFrame, the function will print an
                     error message and return the original DataFrame unchanged.
 
     Raises:
@@ -295,6 +307,7 @@ def stacked_plot(
 ############################# ROC Curves by Category ###########################
 ################################################################################
 
+
 def plot_roc_curves_by_category(
     X_test,
     y_test,
@@ -349,3 +362,150 @@ def plot_roc_curves_by_category(
 
     plt.legend(loc="lower right")
     plt.show()
+
+
+################################################################################
+############################ Calibration Curves ################################
+################################################################################
+
+
+def plot_calibration_curves(y_true, model_dict, figsize=(8, 6), n_bins=10):
+    """
+    Plots calibration curves for the given models along with their Brier scores.
+
+    Parameters:
+    - y_true: array-like, true binary labels
+    - model_dict: dict, a dictionary where keys are model names and values are
+                  predicted probabilities
+    - figsize: tuple, optional, figure size in inches (width, height)
+    - n_bins: int, the number of bins to use for calibration curve
+
+    Returns:
+    - brier_scores: dict, a dictionary of Brier scores for the models
+    """
+
+    # Calculate Brier scores for each model
+    brier_scores = {
+        name: brier_score_loss(y_true, proba) for name, proba in model_dict.items()
+    }
+
+    # Set up the figure
+    plt.figure(figsize=figsize)
+
+    # Generate and plot calibration curves
+    for name, proba in model_dict.items():
+        prob_true, prob_pred = calibration_curve(
+            y_true, proba, n_bins=n_bins, strategy="uniform"
+        )
+        plt.plot(
+            prob_pred,
+            prob_true,
+            marker="o",
+            label=f"{name} (Brier score: {brier_scores[name]:.4f})",
+        )
+
+    # Plot the reference line for perfectly calibrated predictions
+    plt.plot([0, 1], [0, 1], linestyle="--", label="Perfectly Calibrated")
+
+    # Configure the plot
+    plt.ylabel("Fraction of Positives")
+    plt.xlabel("Mean Predicted Value")
+    plt.title("Calibration Plots (Reliability Curves)")
+    plt.legend()
+
+    # Display the plot
+    plt.show()
+
+    return brier_scores
+
+
+################################################################################
+########################### Model Evaluation Metrics ###########################
+################################################################################
+
+
+def evaluate_model_metrics(y_test, model_dict, threshold=0.5):
+    """
+    Evaluates various performance metrics for a given set of models and compiles
+    them into a DataFrame. It also determines the best model for each metric.
+
+    Parameters:
+    - y_test: array-like, true binary labels
+    - model_dict: dict, a dictionary where keys are model names and values are
+                  predicted probabilities
+    - threshold: float, the cutoff threshold for converting predicted
+                 probabilities into binary labels (default is 0.5)
+
+    Returns:
+    - metrics_df: DataFrame, a DataFrame with each metric as a row and models
+                  as columns, including the best model for each metric
+    """
+
+    metrics_dict = {
+        "Metric": [],
+        "AUC ROC": [],
+        "PR AUC": [],
+        "Precision": [],
+        "Recall": [],
+        "Specificity": [],
+        "Average Precision": [],
+        "Brier Score": [],
+    }
+
+    # Evaluate metrics for each model
+    for name, proba in model_dict.items():
+        # ROC AUC
+        fpr, tpr, _ = roc_curve(y_test, proba)
+        roc_auc = auc(fpr, tpr)
+
+        # PR AUC
+        precision, recall, _ = precision_recall_curve(y_test, proba)
+        pr_auc = auc(recall, precision)
+
+        # Predicted labels based on the specified threshold
+        predicted_labels = np.where(proba > threshold, 1, 0)
+
+        # Precision, Recall, and Specificity
+        model_precision = precision_score(y_test, predicted_labels)
+        model_recall = recall_score(y_test, predicted_labels)
+        tn, fp, _, _ = confusion_matrix(y_test, predicted_labels).ravel()
+        model_specificity = tn / (tn + fp)
+
+        # Average Precision
+        avg_precision = average_precision_score(y_test, proba)
+
+        # Brier Score
+        brier_score = brier_score_loss(y_test, proba)
+
+        # Append metrics
+        metrics_dict["Metric"].append(name)
+        metrics_dict["AUC ROC"].append(roc_auc)
+        metrics_dict["PR AUC"].append(pr_auc)
+        metrics_dict["Precision"].append(model_precision)
+        metrics_dict["Recall"].append(model_recall)
+        metrics_dict["Specificity"].append(model_specificity)
+        metrics_dict["Average Precision"].append(avg_precision)
+        metrics_dict["Brier Score"].append(brier_score)
+
+    # Convert metrics_dict to DataFrame
+    metrics_df = pd.DataFrame(metrics_dict)
+
+    # Determine the best model for each metric
+    best_models = []
+    for metric in metrics_dict.keys():
+        if metric != "Metric":
+            if metric == "Brier Score":
+                best_models.append(
+                    metrics_df.loc[metrics_df[metric].idxmin()]["Metric"]
+                )
+            else:
+                best_models.append(
+                    metrics_df.loc[metrics_df[metric].idxmax()]["Metric"]
+                )
+
+    # Assign the list of best models as a new column in the DataFrame
+    metrics_df.set_index("Metric", inplace=True)
+    metrics_df = metrics_df.T  # Transpose to match original structure
+    metrics_df["Best Model"] = best_models
+
+    return metrics_df
