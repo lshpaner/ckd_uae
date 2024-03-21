@@ -8,8 +8,6 @@ from sklearn.metrics import (
     roc_curve,
     auc,
     brier_score_loss,
-    roc_curve,
-    auc,
     precision_recall_curve,
     precision_score,
     recall_score,
