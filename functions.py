@@ -22,6 +22,7 @@ from sklearn.calibration import calibration_curve
 ################## Custom Functions for CKD_UAE Project ########################
 ################################################################################
 
+
 # Function to move a column to be immediately to the left of another column
 def move_column_before(df, target_column, before_column):
     """
@@ -74,6 +75,9 @@ def move_column_before(df, target_column, before_column):
 ################################################################################
 
 
+from matplotlib.ticker import MaxNLocator
+
+
 def crosstab_plot(
     df,
     sub1,
@@ -91,7 +95,7 @@ def crosstab_plot(
     label2=None,
     crosstab_option=True,
     image_path=None,
-    string=None
+    string=None,
 ):
     """
     Generates a series of crosstab plots to visualize the relationship between
@@ -137,6 +141,8 @@ def crosstab_plot(
     fig, axes = plt.subplots(sub1, sub2, figsize=(x, y))
     for item, ax in zip(list_name, axes.flatten()):
         if crosstab_option:
+            # Set a fixed number of ticks for raw data
+            ax.set_ylabel("Frequency"),
             crosstab_data = pd.crosstab(df["outcome"], df[item])
             crosstab_data.plot(
                 kind="bar",
@@ -145,9 +151,19 @@ def crosstab_plot(
                 ax=ax,
                 color=["#00BFC4", "#F8766D"],
             )
+
         else:
+            # Set a fixed number of ticks for percentage data
+            ax.yaxis.set_major_formatter(
+                plt.FuncFormatter(lambda y, _: "{:.2f}".format(y))
+            )
+            ax.set_ylabel("Percentage"),
             # Computing normalized crosstabulation
-            crosstab_data = pd.crosstab(df["outcome"], df[item], normalize="index")
+            crosstab_data = pd.crosstab(
+                df["outcome"],
+                df[item],
+                normalize="index",
+            )
             crosstab_data.plot(
                 kind="bar",
                 stacked=True,
@@ -162,7 +178,6 @@ def crosstab_plot(
         # ax.legend(new_legend)
         ax.set_title(f"Outcome vs. {item}")
         ax.set_xlabel("Outcome")
-        ax.set_ylabel("Frequency")
         # Dynamically setting legend labels
         # Check if the current column is 'Sex' for custom legend labels
         if item == col1:
@@ -182,7 +197,7 @@ def crosstab_plot(
         )
 
     plt.tight_layout(w_pad=w_pad, h_pad=h_pad)
-    if image_path and string: 
+    if image_path and string:
         plt.savefig(os.path.join(image_path, string))
     plt.show()
 
@@ -208,7 +223,7 @@ def stacked_plot(
     custom_order=None,
     legend_labels=False,
     image_path=None,
-    img_string=None
+    img_string=None,
 ):
     """
     Generates a pair of stacked bar plots for a specified column against a ground
@@ -311,7 +326,7 @@ def stacked_plot(
     axes[1].legend(legend_labels, fontsize=12)
 
     fig.align_ylabels()
-    if image_path and img_string: 
+    if image_path and img_string:
         plt.savefig(os.path.join(image_path, img_string))
     plt.show()
 
