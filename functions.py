@@ -89,6 +89,8 @@ def crosstab_plot(
     label1=None,
     label2=None,
     crosstab_option=True,
+    image_path=None,
+    string=None
 ):
     """
     Generates a series of crosstab plots to visualize the relationship between
@@ -120,6 +122,9 @@ def crosstab_plot(
                                         crosstab plots, which are useful for
                                         comparing distributions across groups
                                         with different sizes.
+    - image_path (str): Directory path where generated plot image will be saved.
+    - string (str): Filename for the saved plot image.
+
 
     The function creates a figure with the specified number of subplots laid out
     in a grid, plots the crosstabulation data as bar plots within each subplot,
@@ -176,6 +181,8 @@ def crosstab_plot(
         )
 
     plt.tight_layout(w_pad=w_pad, h_pad=h_pad)
+    if image_path and string: 
+        plt.savefig(os.path.join(image_path, string))
     plt.show()
 
 
@@ -199,6 +206,8 @@ def stacked_plot(
     string=None,
     custom_order=None,
     legend_labels=False,
+    image_path=None,
+    img_string=None
 ):
     """
     Generates a pair of stacked bar plots for a specified column against a ground
@@ -228,6 +237,9 @@ def stacked_plot(
                                               legend is displayed. If a list,
                                               the list values are used as legend
                                               labels.
+
+    - image_path (str): Directory path where generated plot image will be saved.
+    - img_string (str): Filename for the saved plot image.
 
     Returns:
     - None: The function creates & displays the plots but doesn't return value.
@@ -298,6 +310,8 @@ def stacked_plot(
     axes[1].legend(legend_labels, fontsize=12)
 
     fig.align_ylabels()
+    if image_path and img_string: 
+        plt.savefig(os.path.join(image_path, img_string))
     plt.show()
 
 
