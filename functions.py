@@ -397,7 +397,14 @@ def plot_roc_curves_by_category(
 ################################################################################
 
 
-def plot_calibration_curves(y_true, model_dict, figsize=(8, 6), n_bins=10, image_path=None, img_string=None,):
+def plot_calibration_curves(
+    y_true,
+    model_dict,
+    figsize=(8, 6),
+    n_bins=10,
+    image_path=None,
+    img_string=None,
+):
     """
     Plots calibration curves for the given models along with their Brier scores.
 
