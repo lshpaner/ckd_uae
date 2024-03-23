@@ -397,7 +397,7 @@ def plot_roc_curves_by_category(
 ################################################################################
 
 
-def plot_calibration_curves(y_true, model_dict, figsize=(8, 6), n_bins=10):
+def plot_calibration_curves(y_true, model_dict, figsize=(8, 6), n_bins=10, image_path=None, img_string=None,):
     """
     Plots calibration curves for the given models along with their Brier scores.
 
@@ -407,6 +407,9 @@ def plot_calibration_curves(y_true, model_dict, figsize=(8, 6), n_bins=10):
                   predicted probabilities
     - figsize: tuple, optional, figure size in inches (width, height)
     - n_bins: int, the number of bins to use for calibration curve
+    - image_path (str): Directory path where generated plot image will be saved.
+    - img_string (str): Filename for the saved plot image.
+
 
     Returns:
     - brier_scores: dict, a dictionary of Brier scores for the models
@@ -441,6 +444,7 @@ def plot_calibration_curves(y_true, model_dict, figsize=(8, 6), n_bins=10):
     plt.title("Calibration Plots (Reliability Curves)")
     plt.legend()
 
+    plt.savefig(os.path.join(image_path, img_string))
     # Display the plot
     plt.show()
 
