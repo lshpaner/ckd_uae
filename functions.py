@@ -344,6 +344,8 @@ def plot_roc_curves_by_category(
     category_labels,
     outcome,
     title,
+    image_path=None,
+    img_string =None,
 ):
     """
     Plots ROC curves for each category in a specified feature, using custom
@@ -357,6 +359,8 @@ def plot_roc_curves_by_category(
     - feature: Str, the name of the categorical feature in X_test to stratify by.
     - category_labels: Dict, mapping of category codes to descriptive labels.
     - title: String, the title of the plot.
+    - image_path (str): Directory path where generated plot image will be saved.
+    - img_string (str): Filename for the saved plot image.
     """
     plt.title(title)
     plt.plot([0, 1], [0, 1], "r--")
@@ -389,6 +393,7 @@ def plot_roc_curves_by_category(
             )
 
     plt.legend(loc="lower right")
+    plt.savefig(os.path.join(image_path, img_string))
     plt.show()
 
 
