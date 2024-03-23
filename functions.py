@@ -345,7 +345,7 @@ def plot_roc_curves_by_category(
     outcome,
     title,
     image_path=None,
-    img_string =None,
+    img_string=None,
 ):
     """
     Plots ROC curves for each category in a specified feature, using custom
