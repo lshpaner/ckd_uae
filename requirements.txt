@@ -1,0 +1,8 @@
+aequitas==1.0.0
+lifelines==0.28.0
+matplotlib==3.7.1
+numpy==1.25.2
+pandas==1.5.3
+scikit-learn==1.2.2
+seaborn==0.13.1
+tqdm==4.66.2
