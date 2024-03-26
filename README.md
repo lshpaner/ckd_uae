@@ -5,7 +5,7 @@ The repository for this project can be cloned on your device using the commands 
 
 `git init`
 
-`git clone https://github.com/MSADS-505-Data-Science-for-Business/predicting_employee_attrition.git`
+`git clone https://github.com/lshpaner/ckd_uae.git`
 
 ## Overview
 This repository contains the Python code and analysis for a study on Chronic Kidney Disease (CKD) in the UAE. The analysis includes data acquisition, preprocessing, exploratory data analysis, and predive modeling using machine learning.
