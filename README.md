@@ -35,6 +35,17 @@ Contributions to this project are welcome. Please fork the repository and submit
 ## Acknowledgments
 Special thanks to Al-Shamsi et al. for their previous work and to all the contributors to this project.
 
+### References
+
+Al-Shamsi, S., Govender, R. D., & King, J. (2021). Predictive value of creatinine-based equations of kidney function in the long-term prognosis of United Arab Emirates patients with vascular risk. *Oman medical journal, 36*(1), e217. https://doi.org/10.5001/omj.2021.07
+
+
+Al-Shamsi, S., Govender, R. D., & King, J. (2019). Predictive value of creatinine-based equations of kidney function in the long-term prognosis of United Arab Emirates patients with vascular risk [Dataset]. Mendeley Data, V1. https://data.mendeley.com/datasets/ppfwfpprbc/1
+
+
+
+
+
 ## Contact
 For any questions, feel free to open an issue in the repository, and I will get back to you as soon as possible. Also feel free to reach out to me using my email below:
 
