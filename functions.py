@@ -4,6 +4,10 @@ import os
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+from mpl_toolkits.mplot3d import Axes3D
+import plotly.graph_objects as go
+import plotly.offline as pyo
+
 
 from sklearn.metrics import (
     roc_curve,
@@ -16,6 +20,7 @@ from sklearn.metrics import (
     average_precision_score,
 )
 
+from sklearn.inspection import partial_dependence
 from sklearn.calibration import calibration_curve
 
 ################################################################################
@@ -553,3 +558,101 @@ def evaluate_model_metrics(y_test, model_dict, threshold=0.5):
     metrics_df["Best Model"] = best_models
 
     return metrics_df
+
+
+################################################################################
+########################### Partial Dependence Plot ############################
+################################################################################
+
+def plot_3d_partial_dependence(
+    model,
+    dataframe,
+    feature_names_list,
+    x_label,
+    y_label,
+    z_label,
+    title,
+    horizontal,
+    depth,
+    vertical,
+    html_file_name,
+    static=False,
+):
+    """
+    Plots a 3D Partial Dependence Plot using Plotly and optionally with Matplotlib.
+
+    :param model: The trained model (e.g., a fitted RandomForestClassifier or
+                  RandomForestRegressor).
+    :param dataframe: The dataframe to use for the partial dependence
+                      calculation (e.g., X_test).
+    :param feature_names_list: A list of two feature names as strings for the
+                               x and y axes.
+    :param x_label: The label for the x-axis.
+    :param y_label: The label for the y-axis.
+    :param z_label: The label for the z-axis.
+    :param html_file_name: Name of the output HTML file for the interactive plot.
+    :param static: Boolean flag to indicate if a static plot should also be
+                   generated using Matplotlib.
+    """
+
+    # Identifying the indices of the features of interest
+    feature_indices = [
+        list(dataframe.columns).index(feature_names_list[0]),
+        list(dataframe.columns).index(feature_names_list[1]),
+    ]
+
+    # Computing the partial dependence
+    pdp_results = partial_dependence(
+        model,
+        X=dataframe,
+        features=[(feature_indices[0], feature_indices[1])],
+        grid_resolution=20,
+    )
+
+    # Extracting the meshgrid which was used for calculation
+    XX, YY = np.meshgrid(pdp_results["values"][0], pdp_results["values"][1])
+
+    # pdp_results['average'][0] contains the partial dependence values
+    ZZ = pdp_results["average"][0].reshape(XX.shape)
+
+    # Plotly Interactive Plot
+    plotly_fig = go.Figure(data=[go.Surface(z=ZZ, x=XX, y=YY)])
+
+    plotly_fig.update_layout(
+        title=title,
+        scene=dict(
+            xaxis_title=x_label,
+            yaxis_title=y_label,
+            zaxis_title=z_label,
+            camera=dict(
+                eye=dict(
+                    x=horizontal, y=depth, z=vertical
+                )  # Adjust the eye (camera position) as needed
+            ),
+        ),
+        autosize=True,
+        width=800,
+        height=800,
+        margin=dict(l=10, r=10, b=10, t=50),
+    )
+
+    plotly_fig.show()
+    pyo.plot(plotly_fig, filename=html_file_name)
+
+    # Matplotlib Static Plot (Optional)
+    if static:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+        surf = ax.plot_surface(
+            XX,
+            YY,
+            ZZ,
+            cmap=plt.cm.coolwarm,
+            edgecolor="none",
+        )
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+        ax.set_zlabel(z_label)
+        ax.set_title(title),
+        fig.colorbar(surf, shrink=0.5, aspect=5)
+        plt.show()
