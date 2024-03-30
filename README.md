@@ -8,13 +8,16 @@ The repository for this project can be cloned on your device using the commands 
 `git clone https://github.com/lshpaner/ckd_uae.git`
 
 ## Overview
-This repository contains the Python code and analysis for a study on Chronic Kidney Disease (CKD) in the UAE. The analysis includes data acquisition, preprocessing, exploratory data analysis, and predive modeling using machine learning.
+
+The burden of Chronic Kidney Disease (CKD) is a pressing global health issue, and its impact on public health in the UAE is of particular concern. 
+
+This repository contains the Python code and analysis for a study on Chronic Kidney Disease (CKD) in the UAE. The analysis includes data acquisition, preprocessing, exploratory data analysis, and predictive modeling using machine learning to tackle this challenge head-on.
 
 ## Data
 The dataset used in this study is comprised of various factors contributing to CKD, including sex, medical measurements, and diagnostic results. The data has been anonymized to protect patient privacy.
 
 ## Requirements
-To run the analysis, you will need R and the following Python packages:
+To run the analysis, you will need R and the following Python libraries:
 
 `aequitas==1.0.0`  
 `lifelines==0.28.0`  
@@ -48,8 +51,6 @@ Al-Shamsi, S., Govender, R. D., & King, J. (2021). Predictive value of creatinin
 
 
 Al-Shamsi, S., Govender, R. D., & King, J. (2019). Predictive value of creatinine-based equations of kidney function in the long-term prognosis of United Arab Emirates patients with vascular risk [Dataset]. Mendeley Data, V1. https://data.mendeley.com/datasets/ppfwfpprbc/1
-
-
 
 
 
