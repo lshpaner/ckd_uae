@@ -3,6 +3,7 @@ import numpy as np
 import os
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
@@ -78,10 +79,6 @@ def move_column_before(df, target_column, before_column):
 ################################################################################
 ################################ Cross-Tab Plot ################################
 ################################################################################
-
-
-from matplotlib.ticker import MaxNLocator
-
 
 def crosstab_plot(
     df,
