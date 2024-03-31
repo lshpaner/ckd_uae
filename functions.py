@@ -673,11 +673,19 @@ def plot_3d_partial_dependence(
             margin=dict(l=65, r=65, b=50, t=50),
         )
 
-        # Save the HTML file to the specified path
-        html_file_dir = os.path.dirname(html_file_path)
+        # Correctly combining the directory and file name for the output HTML file
+        full_html_file_path = os.path.join(
+            html_file_path,
+            html_file_name,
+        )
+
+        # Ensure the directory exists
+        html_file_dir = os.path.dirname(full_html_file_path)
         if not os.path.exists(html_file_dir):
             os.makedirs(html_file_dir)
-        pyo.plot(plotly_fig, filename=html_file_path, auto_open=False)
+
+        # Save the HTML file to the specified full path
+        pyo.plot(plotly_fig, filename=full_html_file_path, auto_open=False)
 
         plotly_fig.show()
 
