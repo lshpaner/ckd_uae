@@ -1,4 +1,4 @@
-# Chronic Kidney Disease Study in UAE
+# Kidney Function and Mortality in the United Arab Emirates
 
 ## Installation
 The repository for this project can be cloned on your device using the commands below:
