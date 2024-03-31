@@ -575,24 +575,33 @@ def plot_3d_partial_dependence(
     horizontal,
     depth,
     vertical,
+    html_file_path,
     html_file_name,
+    interactive=True,
     static=False,
+    matplotlib_colormap="coolwarm",
+    plotly_colormap="Viridis",
+    zoom_out_factor=None,
 ):
     """
     Plots a 3D Partial Dependence Plot using Plotly and optionally with Matplotlib.
 
-    :param model: The trained model (e.g., a fitted RandomForestClassifier or
+    model: The trained model (e.g., a fitted RandomForestClassifier or
                   RandomForestRegressor).
-    :param dataframe: The dataframe to use for the partial dependence
+    dataframe: The dataframe to use for the partial dependence
                       calculation (e.g., X_test).
-    :param feature_names_list: A list of two feature names as strings for the
+    feature_names_list: A list of two feature names as strings for the
                                x and y axes.
-    :param x_label: The label for the x-axis.
-    :param y_label: The label for the y-axis.
-    :param z_label: The label for the z-axis.
-    :param html_file_name: Name of the output HTML file for the interactive plot.
-    :param static: Boolean flag to indicate if a static plot should also be
+    x_label: The label for the x-axis.
+    y_label: The label for the y-axis.
+    z_label: The label for the z-axis.
+    html_file_name: Name of the output HTML file for the interactive plot.
+    interactive: Boolean flag to indicate if an interactive plot should be inc.
+    static: Boolean flag to indicate if a static plot should also be
                    generated using Matplotlib.
+    matplotlib_colormap: Adjustable colormap for the static plot
+    plotly_colormap: Adjustable colormap for the interactive plot
+    zoom_out_factor: Adjustable zoom scaling for interactive plot
     """
 
     # Identifying the indices of the features of interest
@@ -615,44 +624,81 @@ def plot_3d_partial_dependence(
     # pdp_results['average'][0] contains the partial dependence values
     ZZ = pdp_results["average"][0].reshape(XX.shape)
 
-    # Plotly Interactive Plot
-    plotly_fig = go.Figure(data=[go.Surface(z=ZZ, x=XX, y=YY)])
+    if interactive:
+        # Plotly Interactive Plot
+        plotly_fig = go.Figure(
+            data=[
+                go.Surface(
+                    z=ZZ,
+                    x=XX,
+                    y=YY,
+                    colorscale=plotly_colormap,
+                )
+            ]
+        )
 
-    plotly_fig.update_layout(
-        title=title,
-        scene=dict(
-            xaxis_title=x_label,
-            yaxis_title=y_label,
-            zaxis_title=z_label,
-            camera=dict(
-                eye=dict(
-                    x=horizontal, y=depth, z=vertical
-                )  # Adjust the eye (camera position) as needed
+        plotly_fig.update_layout(
+            title=title,
+            scene=dict(
+                xaxis_title=x_label,
+                yaxis_title=y_label,
+                zaxis_title=z_label,
+                camera=dict(
+                    # Adjust the eye (camera position) as needed
+                    eye=dict(
+                        x=horizontal * zoom_out_factor,
+                        y=depth * zoom_out_factor,
+                        z=vertical * zoom_out_factor,
+                    )
+                ),
+                xaxis=dict(
+                    showgrid=True,
+                    gridcolor="darkgrey",
+                    gridwidth=2,
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor="darkgrey",
+                    gridwidth=2,
+                ),
+                zaxis=dict(
+                    showgrid=True,
+                    gridcolor="darkgrey",
+                    gridwidth=2,
+                ),
             ),
-        ),
-        autosize=True,
-        width=800,
-        height=800,
-        margin=dict(l=10, r=10, b=10, t=50),
-    )
+            autosize=True,
+            width=900,
+            height=900,
+            margin=dict(l=65, r=65, b=50, t=50),
+        )
 
-    plotly_fig.show()
-    pyo.plot(plotly_fig, filename=html_file_name)
+        # Save the HTML file to the specified path
+        html_file_dir = os.path.dirname(html_file_path)
+        if not os.path.exists(html_file_dir):
+            os.makedirs(html_file_dir)
+        pyo.plot(plotly_fig, filename=html_file_path, auto_open=False)
+
+        plotly_fig.show()
 
     # Matplotlib Static Plot (Optional)
+
     if static:
-        fig = plt.figure()
+        fig = plt.figure(figsize=(8, 6))
         ax = fig.add_subplot(111, projection="3d")
         surf = ax.plot_surface(
             XX,
             YY,
             ZZ,
-            cmap=plt.cm.coolwarm,
+            cmap=matplotlib_colormap,
             edgecolor="none",
         )
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
         ax.set_zlabel(z_label)
-        ax.set_title(title),
-        fig.colorbar(surf, shrink=0.5, aspect=5)
-        plt.show()
+        ax.set_title(title)
+
+        # Create the colorbar
+        cbar = fig.colorbar(surf, shrink=0.5, aspect=5, pad=0.1)
+        cbar.set_label("", rotation=270, labelpad=15)
+
