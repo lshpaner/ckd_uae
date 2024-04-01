@@ -574,6 +574,9 @@ def plot_3d_partial_dependence(
     vertical,
     html_file_path,
     html_file_name,
+    x_label_plotly=None,
+    y_label_plotly=None,
+    z_label_plotly=None,
     interactive=True,
     static=False,
     matplotlib_colormap="coolwarm",
@@ -593,6 +596,11 @@ def plot_3d_partial_dependence(
     y_label: The label for the y-axis.
     z_label: The label for the z-axis.
     html_file_name: Name of the output HTML file for the interactive plot.
+    x_label_plotly: The optional x-axis label for plotly in case you want to
+                    parse in direct copy/paste of foreign chars (i.e., Greek)
+                    since it does not natively support LaTeX.
+    y_label_plotly: The optional y-axis label for plotly (same as above).
+    z_label_plotly: The optional z-axis label for plotly (same as above).
     interactive: Boolean flag to indicate if an interactive plot should be inc.
     static: Boolean flag to indicate if a static plot should also be
                    generated using Matplotlib.
@@ -644,9 +652,9 @@ def plot_3d_partial_dependence(
         plotly_fig.update_layout(
             title=title,
             scene=dict(
-                xaxis_title=x_label,
-                yaxis_title=y_label,
-                zaxis_title=z_label,
+                xaxis_title=x_label_plotly,
+                yaxis_title=y_label_plotly,
+                zaxis_title=z_label_plotly,
                 camera=dict(
                     eye=dict(
                         x=horizontal * zoom_out_factor,
