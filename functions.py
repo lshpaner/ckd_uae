@@ -630,6 +630,13 @@ def plot_3d_partial_dependence(
                     x=XX,
                     y=YY,
                     colorscale=plotly_colormap,
+                    # Set color bar properties here
+                    colorbar=dict(
+                        len=0.65,  # Color bar length, relative to plot height
+                        thickness=25,  # Color bar thickness
+                        yanchor='middle',
+                        y=0.5,
+                    )
                 )
             ]
         )
@@ -641,33 +648,20 @@ def plot_3d_partial_dependence(
                 yaxis_title=y_label,
                 zaxis_title=z_label,
                 camera=dict(
-                    # Adjust the eye (camera position) as needed
                     eye=dict(
                         x=horizontal * zoom_out_factor,
                         y=depth * zoom_out_factor,
                         z=vertical * zoom_out_factor,
                     )
                 ),
-                xaxis=dict(
-                    showgrid=True,
-                    gridcolor="darkgrey",
-                    gridwidth=2,
-                ),
-                yaxis=dict(
-                    showgrid=True,
-                    gridcolor="darkgrey",
-                    gridwidth=2,
-                ),
-                zaxis=dict(
-                    showgrid=True,
-                    gridcolor="darkgrey",
-                    gridwidth=2,
-                ),
+                xaxis=dict(showgrid=True, gridcolor="darkgrey", gridwidth=2),
+                yaxis=dict(showgrid=True, gridcolor="darkgrey", gridwidth=2),
+                zaxis=dict(showgrid=True, gridcolor="darkgrey", gridwidth=2),
             ),
             autosize=True,
             width=900,
-            height=900,
-            margin=dict(l=65, r=65, b=50, t=50),
+            height=750,
+            margin=dict(l=65, r=65, b=65, t=5),
         )
 
         # Correctly combining the directory and file name for the output HTML file
@@ -682,7 +676,8 @@ def plot_3d_partial_dependence(
             os.makedirs(html_file_dir)
 
         # Save the HTML file to the specified full path
-        pyo.plot(plotly_fig, filename=full_html_file_path, auto_open=False)
+        pyo.plot(plotly_fig, filename=full_html_file_path, auto_open=False, 
+                 config={'modeBarButtonsToRemove': ['resetCameraDefault3d']})
 
         plotly_fig.show()
 
@@ -706,4 +701,3 @@ def plot_3d_partial_dependence(
         # Create the colorbar
         cbar = fig.colorbar(surf, shrink=0.5, aspect=5, pad=0.1)
         cbar.set_label("", rotation=270, labelpad=15)
-
